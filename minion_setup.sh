@@ -12,11 +12,16 @@ echo 'Salt Master IP address is ' $1
 
 [ -f /vagrant/$min_name.conf ] || die "File: /vagrant/$min_name.conf does not exist"
 
+echo 'Installing salt-minion'
+sudo apt-get update
+sudo apt-get --yes install python-software-properties
+sudo add-apt-repository --yes ppa:saltstack/salt
+sudo apt-get update
+sudo apt-get --yes install salt-minion
+
 sudo sed 's/#master: salt/master: '${1}'/g' /vagrant/$min_name.conf | sudo tee /etc/salt/minion > /dev/null
 
-echo 'Starting Salt Minion'
-nohup sudo salt-minion > /dev/null 2>&1 &
-echo 'Salt Minion started'
+sudo service salt-minion start
 
 echo 'Call state.highstate command to configure minion'
 sudo salt-call state.highstate
